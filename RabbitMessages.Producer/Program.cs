@@ -1,4 +1,6 @@
-﻿using RabbitMQ.Client;
+﻿using RabbitMessages.Producer.Data;
+using RabbitMessages.Producer.Models;
+using RabbitMQ.Client;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -22,31 +24,25 @@ namespace RabbitMessages.Producer
             {
                 using (var channel = connection.CreateModel())
                 {
-                    channel.QueueDeclare(queue: "hello",
-                        durable: true,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null);
-
-                    Object objPessoa = new
-                    {
-                        Nome = "Diego Doná",
-                        DataDeNascimento = new DateTime(1989, 6, 19),
-                        Id = Guid.NewGuid(),
-                        Momento = DateTime.Now
-                    };
-
+                    channel.ExchangeDeclare("people", ExchangeType.Topic, durable: true);
+                    var person = GetRandomPerson();
                     var basicProperties = channel.CreateBasicProperties();
-                    basicProperties.DeliveryMode = 2;
+                    var routingKey = person.VIP ? "people.vip" : "people.normal";
+                    basicProperties.Persistent = true;
 
-                    channel.BasicPublish(exchange: "",
-                        routingKey: "hello",
+                    channel.BasicPublish(exchange: "people",
+                        routingKey: routingKey,
                         basicProperties: basicProperties,
-                        body: ObjetoParaArray(objPessoa));
+                        body: ObjetoParaArray(person));
                 }
             }
 
             Console.WriteLine("Hello World!");
+        }
+
+        private static Person GetRandomPerson()
+        {
+            return new PeopleFactory().GetRandom();
         }
 
         static byte[] ObjetoParaArray(object objeto)
