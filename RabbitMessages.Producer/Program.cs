@@ -33,7 +33,7 @@ namespace RabbitMessages.Producer
                     channel.BasicPublish(exchange: "people",
                         routingKey: routingKey,
                         basicProperties: basicProperties,
-                        body: ObjetoParaArray(person));
+                        body: ObjectToArray(person));
                 }
             }
 
@@ -45,7 +45,7 @@ namespace RabbitMessages.Producer
             return new PeopleFactory().GetRandom();
         }
 
-        static byte[] ObjetoParaArray(object objeto)
+        static byte[] ObjectToArray(object objeto)
         {
             string serializado = JsonSerializer.Serialize(objeto);
             return Encoding.UTF8.GetBytes(serializado);
