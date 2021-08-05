@@ -4,6 +4,7 @@ using RabbitMQ.Client;
 using System;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace RabbitMessages.Producer
 {
@@ -18,24 +19,28 @@ namespace RabbitMessages.Producer
                 Uri = new Uri("amqp://guest:guest@localhost:5672")
             };
 
-            string name;
-            using(var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
+            do
             {
-                channel.ExchangeDeclare("people", ExchangeType.Topic, durable: true);
-                var person = GetRandomPerson();
-                name = person.Name;
-                var basicProperties = channel.CreateBasicProperties();
-                var routingKey = person.VIP ? "people.vip" : "people.normal";
-                basicProperties.Persistent = true;
+                string name;
+                using (var connection = factory.CreateConnection())
+                using (var channel = connection.CreateModel())
+                {
+                    channel.ExchangeDeclare("people", ExchangeType.Topic, durable: true);
+                    var person = GetRandomPerson();
+                    name = person.Name;
+                    var basicProperties = channel.CreateBasicProperties();
+                    var routingKey = person.VIP ? "people.vip" : "people.normal";
+                    basicProperties.Persistent = true;
 
-                channel.BasicPublish(exchange: "people",
-                    routingKey: routingKey,
-                    basicProperties: basicProperties,
-                    body: ObjectToArray(person));
-            }
+                    channel.BasicPublish(exchange: "people",
+                        routingKey: routingKey,
+                        basicProperties: basicProperties,
+                        body: ObjectToArray(person));
+                }
 
-            Console.WriteLine($"PRODUCER RAN - {name}");
+                Console.WriteLine($"PRODUCER RAN - {name} - {DateTime.Now}");
+                Thread.Sleep(1000);
+            } while (true);
         }
 
         private static Person GetRandomPerson()

@@ -19,8 +19,12 @@ namespace RabbitMessages.Consumer
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare("people", ExchangeType.Topic, durable: true);
+
                 channel.QueueDeclare("people_normal", durable: true, exclusive: false, autoDelete: false);
                 channel.QueueBind("people_normal", "people", "people.normal");
+
+                channel.QueueDeclare("people_general", durable: true, exclusive: false, autoDelete: false);
+                channel.QueueBind("people_general", "people", "people.*");
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (object model, BasicDeliverEventArgs ea) =>

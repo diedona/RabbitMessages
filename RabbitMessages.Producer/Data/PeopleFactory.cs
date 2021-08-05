@@ -34,6 +34,12 @@ namespace RabbitMessages.Producer.Data
                 },
                 new Person()
                 {
+                    Name = "José Pessoa",
+                    Birthday = new DateTime(1997, 5, 2),
+                    Id = Guid.NewGuid()
+                },
+                new Person()
+                {
                     Name = "Levy Fidelix",
                     Birthday = new DateTime(1951, 12, 27),
                     Id = Guid.NewGuid(),
