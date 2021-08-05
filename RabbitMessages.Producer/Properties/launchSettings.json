@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RabbitMessages.Producer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
